@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task List</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/523f3a835f.js" crossorigin="anonymous"></script>
+    <script defer src="list.js"></script>
+  </head>
+  <div class="dragable"></div>
+  <body>
+    <div class="columns is-mobile is-vcentered">
+      <div class="column is-narrow">
+        <h1 class="title has-text-white">Task List</h1>
+      </div>
+      <div class="column is-two-thirds">
+        <progress id="pgb" class="progress is-success is-medium mt-3 ml-3" value="1" max="100"></progress>
+      </div>
+      <div class="column is-narrow">
+
+      </div>
+    </div>
+    <div id="tasks" class="pl-5">
+      <ul id="list"></ul>
+      <button id="addItem" class="button is-dark mt-3">
+        <span class="icon">
+          <i class="fa-regular fa-plus"></i>
+        </span>
+      </button>
+    </div>
+  </body>
+</html>
