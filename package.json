@@ -18,7 +18,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@picocss/pico": "^1.5.7",
+    "electron-squirrel-startup": "^1.0.0",
+    "node-html-parser": "^6.1.4"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",

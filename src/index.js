@@ -1,5 +1,6 @@
 const { app, BrowserWindow} = require('electron');
 const path = require('path');
+const HTMLParser = require('node-html-parser');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -12,7 +13,7 @@ const createWindow = () => {
     width: 550,
     height: 700,
     titleBarStyle: 'hidden',
-    titleBarOverlay: true,
+    // titleBarOverlay: true,
     icon: "src/media/listclipboard@2x.png",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -52,31 +53,49 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 // create tray icon
-const {Tray, Menu, nativeImage } = require('electron');
+const {Tray, Menu, MenuItem, nativeImage } = require('electron');
+const { EventEmitter } = require('stream');
 
 let tray
-
-let maxIconSize = {
-  width: 10,
-  height: 10
-}
 
 app.whenReady().then(() => {
   const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
   tray = new Tray(icon)       
 
 
-
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'bruh', type: 'radio' },
-    { label: 'i am done', type: 'radio' },
-    { label: 'gg', type: 'radio', checked: true },
-  ])
-  
+  let contextMenu = Menu()
   tray.setContextMenu(contextMenu)
+  
 
   tray.setToolTip('This is my application')
   // tray.setTitle('This is my title')
+
+  foo = ['bar', 'bitch', 'fuck']
+  // tray.addListener('mouse-up', () => {
+  //   contextMenu = Menu()
+  //   // let {taskNames} = require('./list.js');
+    // let root = HTMLParser.parse('./index.html')
+    // let items = root.querySelectorAll("h1")
+    // console.log(items[0])
+
+
+    for (let i=0; i < foo.length; i++) {
+      contextMenu.append(new MenuItem({label: foo[i]}))
+      console.log(foo[i])
+    }
+    tray.setContextMenu(contextMenu)
+  // })
 })
 
-// create list
+
+
+// function updateTrayMenu() {
+//   app.whenReady().then(() => {
+//     let contextMenu = Menu()
+
+//     for (let i=0; i < foo.length; i++) {
+//       contextMenu.append(new MenuItem({label: taskNames[i]}))
+//     }
+//     tray.setContextMenu(contextMenu)
+//   })
+// }

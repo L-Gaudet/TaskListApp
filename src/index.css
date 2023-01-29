@@ -4,27 +4,35 @@ body {
   margin: auto;
   max-width: 38rem;
   padding: 2rem;
-  background-color: #262626;
+  /* background-color: #262626;
   min-width: 100vw;
-  min-height: 100vh;
+  min-height: 100vh; */
 }
 
 .dragable {
-  height: 20px;
+  height: 40px;
   width: 100vw;
   -webkit-app-region: drag;
+  margin-top: -30px;
+  margin-bottom: -30px;
+  /* padding-bottom: -50px; */
 }
 
-p {
-  padding: 10px;
-  /* color: white; */
+.ghost {
+  border: none;
+  /* box-shadow: none; */
 }
 
-.title {
-  /* padding: 25px 10px 10px 10px; */
-  padding: 10px 0px 0px 10px;
-  /* color: white; */
+button:active {
+  outline: none;
 }
+
+button:focus{
+  /* border: none; */
+  outline: none;
+}
+
+/* button:enabled */
 
 .item {
   border: none;
