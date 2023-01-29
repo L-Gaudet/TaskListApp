@@ -13,7 +13,6 @@ const createWindow = () => {
     width: 550,
     height: 700,
     titleBarStyle: 'hidden',
-    // titleBarOverlay: true,
     icon: "src/media/listclipboard@2x.png",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -56,46 +55,22 @@ app.on('activate', () => {
 const {Tray, Menu, MenuItem, nativeImage } = require('electron');
 const { EventEmitter } = require('stream');
 
+const {ipcMain} = require('electron')
+
 let tray
+
+ipcMain.on('set-menu', (event, menu) => {
+  let contextMenu = Menu()
+  for (let i=0; i < menu.length; i++) {
+    contextMenu.append(new MenuItem({label: menu[i]}))
+    console.log(menu[i])
+  }
+  tray.setContextMenu(contextMenu)
+})
 
 app.whenReady().then(() => {
   const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
-  tray = new Tray(icon)       
-
-
-  let contextMenu = Menu()
-  tray.setContextMenu(contextMenu)
-  
-
-  tray.setToolTip('This is my application')
-  // tray.setTitle('This is my title')
-
-  foo = ['bar', 'bitch', 'fuck']
-  // tray.addListener('mouse-up', () => {
-  //   contextMenu = Menu()
-  //   // let {taskNames} = require('./list.js');
-    // let root = HTMLParser.parse('./index.html')
-    // let items = root.querySelectorAll("h1")
-    // console.log(items[0])
-
-
-    for (let i=0; i < foo.length; i++) {
-      contextMenu.append(new MenuItem({label: foo[i]}))
-      console.log(foo[i])
-    }
-    tray.setContextMenu(contextMenu)
-  // })
+  tray = new Tray(icon)    
+  let contextMenu = Menu.buildFromTemplate([{label: 'no tasks yet'}])
+  tray.setContextMenu(contextMenu)   
 })
-
-
-
-// function updateTrayMenu() {
-//   app.whenReady().then(() => {
-//     let contextMenu = Menu()
-
-//     for (let i=0; i < foo.length; i++) {
-//       contextMenu.append(new MenuItem({label: taskNames[i]}))
-//     }
-//     tray.setContextMenu(contextMenu)
-//   })
-// }

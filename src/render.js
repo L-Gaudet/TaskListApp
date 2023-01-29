@@ -2,9 +2,7 @@ const addItemBtn = document.getElementById('addItem')
 const tasks = document.getElementById('tasks')
 let list = document.getElementById('list')
 const pgb = document.getElementById('pgb')
-let listItems = list.getElementsByTagName('li');
 
-// addItemBtn.onclick = addItem
 addItemBtn.onclick = getListItems
 
 let numOfItems = 0
@@ -25,7 +23,7 @@ function addItem() {
     // name="checkAddress" onclick="checkAddress(this)"
     label.setAttribute('contenteditable', 'true')
     label.setAttribute('data-myid', checkbox.id)
-    label.setAttribute('id', 'item')
+    label.setAttribute('name', 'item')
     label.innerHTML = 'task ' + numOfItems
     checkbox.classList.add('checkbox')
 
@@ -37,45 +35,31 @@ function addItem() {
     numOfItems++
     
     pgb.setAttribute('max', numOfItems)
+
+    // eventEmitter.emit('itemAdded') //#########
 }
 
 // const { remote } = require('electron')
 // const { Menu, Tray } = remote
 
+
 async function getListItems() {
     await addItem()
     taskNames = []
+    listItems = document.getElementsByName('item')
+    console.log(taskNames)
     for (let i = 0; i < listItems.length; i++) {
-        taskNames.push(listItems[i].firstChild.lastChild.innerHTML)
+        taskNames.push(listItems[i].innerHTML)
     }
-    // let tray
-    // const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
-    // tray = new Tray(icon)  
-
-    // contextMenu = Menu()
-    // for (let i=0; i < foo.length; i++) {
-    // contextMenu.append(new MenuItem({label: taskNames[i]}))
-    // console.log(taskNames[i])
-    // }
-    // tray.setContextMenu(contextMenu)
+    window.electronAPI.setMenu(taskNames)
 }
 
 function checkAddress(checkbox)
 {
-    if (checkbox.checked)
-    {
+    if (checkbox.checked) {
         pgb.setAttribute('value', ++numItemsComplete);
-
     }
     else {
         pgb.setAttribute('value', --numItemsComplete);
     }
 }
-
-// function writeToFile(data) {
-//     const fs = require('fs')
-//     fs.writeile('./list.txt', data, (err) => {
-//         // In case of a error throw err.
-//         if (err) throw err;
-//     })
-// }
