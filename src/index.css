@@ -24,14 +24,17 @@ body {
 }
 
 button:active {
-  outline: none;
+  outline: 0;
 }
 
 button:focus{
   /* border: none; */
-  outline: none;
+  outline: 0;
 }
-
+button {
+  border: 0;
+  outline: 0;
+}
 /* button:enabled */
 
 .item {

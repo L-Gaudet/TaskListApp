@@ -24,6 +24,9 @@ function addItem() {
     label.setAttribute('contenteditable', 'true')
     label.setAttribute('data-myid', checkbox.id)
     label.setAttribute('name', 'item')
+    label.setAttribute('style', 'outline: 0; width: 100%; max-width: 365px;')
+    label.setAttribute('placeholder', "Enter task here…")
+    label.setAttribute('data-content-editable-leaf', 'true')
     label.innerHTML = 'task ' + numOfItems
     checkbox.classList.add('checkbox')
 
@@ -54,12 +57,15 @@ async function getListItems() {
     window.electronAPI.setMenu(taskNames)
 }
 
-function checkAddress(checkbox)
-{
+function checkAddress(checkbox) {
     if (checkbox.checked) {
         pgb.setAttribute('value', ++numItemsComplete);
     }
     else {
         pgb.setAttribute('value', --numItemsComplete);
     }
+}
+
+function updateTask(label) {
+    // on enter press exit selection and call context bridge to send updates task names to main js
 }
