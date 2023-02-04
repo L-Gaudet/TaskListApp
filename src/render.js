@@ -3,8 +3,6 @@ const tasks = document.getElementById('tasks')
 let list = document.getElementById('list')
 const pgb = document.getElementById('pgb')
 
-addItemBtn.onclick = getListItems
-
 let numOfItems = 0
 let numItemsComplete = 0
 let taskNames 
@@ -39,16 +37,13 @@ function addItem() {
     numOfItems++
     
     pgb.setAttribute('max', numOfItems)
-
-    // eventEmitter.emit('itemAdded') //#########
+    updateTaskNames()
 }
 
-// const { remote } = require('electron')
-// const { Menu, Tray } = remote
 
-
-async function getListItems() {
-    await addItem()
+// async function getListItems() {
+function updateTaskNames() {
+    // await addItem()
     taskNames = []
     listItems = document.getElementsByName('item')
     console.log(taskNames)
@@ -72,16 +67,8 @@ function keyDown(event, label) {
     if (event.keyCode == 13) {
         console.log(label)
         label.blur()
-        taskNames = []
-        listItems = document.getElementsByName('item')
-        console.log(taskNames)
-        for (let i = 0; i < listItems.length; i++) {
-            taskNames.push(listItems[i].innerHTML)
-        }
-        window.electronAPI.setMenu(taskNames)
+        updateTaskNames()
     }
 }
 
-function updateTask(label) {
-    // on enter press exit selection and call context bridge to send updates task names to main js
-}
+addItemBtn.onclick = addItem
