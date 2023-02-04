@@ -14,11 +14,10 @@ function addItem() {
     let checkbox = document.createElement('input')
     let label = document.createElement('label')
 
-    // container.classList.add('grid')
     checkbox.setAttribute('type', 'checkbox')
     checkbox.setAttribute('data-myid', 'item'+numOfItems)
     checkbox.setAttribute('onclick', 'checkAddress(this)')
-    // name="checkAddress" onclick="checkAddress(this)"
+
     label.setAttribute('contenteditable', 'true')
     label.setAttribute('data-myid', checkbox.id)
     label.setAttribute('name', 'item')
@@ -27,8 +26,8 @@ function addItem() {
     label.setAttribute('data-content-editable-leaf', 'true')
     label.setAttribute('onkeydown', 'keyDown(event, this)')
     label.innerHTML = 'task ' + numOfItems
-    checkbox.classList.add('checkbox')
 
+    checkbox.classList.add('checkbox')
     checkbox.append(label)
     container.appendChild(checkbox)
     container.appendChild(label)
@@ -46,7 +45,6 @@ function updateTaskNames() {
     // await addItem()
     taskNames = []
     listItems = document.getElementsByName('item')
-    console.log(taskNames)
     for (let i = 0; i < listItems.length; i++) {
         taskNames.push(listItems[i].innerHTML)
     }
@@ -56,17 +54,23 @@ function updateTaskNames() {
 function checkAddress(checkbox) {
     if (checkbox.checked) {
         pgb.setAttribute('value', ++numItemsComplete);
+        checkbox.nextSibling.setAttribute('style', 'outline: 0; width: 100%; max-width: 365px; text-decoration: line-through;')
     }
     else {
         pgb.setAttribute('value', --numItemsComplete);
+        checkbox.nextSibling.setAttribute('style', 'outline: 0; width: 100%; max-width: 365px;')
     }
 }
 
 function keyDown(event, label) {
     console.log(event.keyCode)
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
         console.log(label)
         label.blur()
+        updateTaskNames()
+    }
+    else if (event.keyCode === 8 && label.innerHTML === '') {
+        label.parentNode.parentNode.remove()
         updateTaskNames()
     }
 }
