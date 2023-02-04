@@ -27,6 +27,7 @@ function addItem() {
     label.setAttribute('style', 'outline: 0; width: 100%; max-width: 365px;')
     label.setAttribute('placeholder', "Enter task here…")
     label.setAttribute('data-content-editable-leaf', 'true')
+    label.setAttribute('onkeydown', 'keyDown(event, this)')
     label.innerHTML = 'task ' + numOfItems
     checkbox.classList.add('checkbox')
 
@@ -63,6 +64,21 @@ function checkAddress(checkbox) {
     }
     else {
         pgb.setAttribute('value', --numItemsComplete);
+    }
+}
+
+function keyDown(event, label) {
+    console.log(event.keyCode)
+    if (event.keyCode == 13) {
+        console.log(label)
+        label.blur()
+        taskNames = []
+        listItems = document.getElementsByName('item')
+        console.log(taskNames)
+        for (let i = 0; i < listItems.length; i++) {
+            taskNames.push(listItems[i].innerHTML)
+        }
+        window.electronAPI.setMenu(taskNames)
     }
 }
 
