@@ -40,6 +40,11 @@ li::marker {
   color: transparent;
 }
 
+[contenteditable]:empty:after {
+  content: attr(placeholder);
+  color: rgba(255, 255, 255, 0.25)
+}
+
 .item {
   border: none;
   border-color: none;
