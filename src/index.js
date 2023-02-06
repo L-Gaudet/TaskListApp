@@ -23,7 +23,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -63,7 +63,7 @@ ipcMain.on('set-menu', (event, menu) => {
   let contextMenu = Menu()
   for (let i=0; i < menu.length; i++) {
     contextMenu.append(new MenuItem({label: menu[i]}))
-    console.log(menu[i])
+    // console.log(menu[i])
   }
   tray.setContextMenu(contextMenu)
 })
@@ -71,6 +71,6 @@ ipcMain.on('set-menu', (event, menu) => {
 app.whenReady().then(() => {
   const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
   tray = new Tray(icon)    
-  let contextMenu = Menu.buildFromTemplate([{label: 'no tasks yet'}])
+  let contextMenu = Menu.buildFromTemplate([{label: 'No tasks yet'}])
   tray.setContextMenu(contextMenu)   
 })
