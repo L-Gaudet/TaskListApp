@@ -1,13 +1,11 @@
 const addItemBtn = document.getElementById('addItem')
-// const tasks = document.getElementById('tasks')
 let list = document.getElementById('list')
 const pgb = document.getElementById('pgb')
 
-let numOfItems = 0
-console.log('number of items: ' + (numOfItems))
 let numItemsComplete = 0
-let taskNames  // -> value
+let taskNames  // -> holds names of tasks
 let taskIndices = new Map() // key: uniqueID, value: index in task names array
+let numOfActualTasks = 0
 
 let currentElement
 
@@ -16,7 +14,6 @@ function selectCurrentElement(label) {
 }
 
 function createUniqueID() {
-    // create next unique ID
     return Math.floor(Math.random() * Date.now())
 }
 
@@ -43,7 +40,7 @@ function createItem() {
     label.setAttribute('data-content-editable-leaf', 'true')
     label.setAttribute('onkeydown', 'keyDown(event, this)')
     label.setAttribute('onfocusout', 'updateTaskNames()')
-    label.setAttribute('onfocus', 'selectCurrentElement(this)')
+    label.setAttribute('onfocus', 'selectCurrentElement(this);')
 
     container.setAttribute('name', 'item')
     container.setAttribute('id', uniqueID)
@@ -53,8 +50,6 @@ function createItem() {
     container.appendChild(checkbox)
     container.appendChild(label)
     li.appendChild(container)
-    
-    numOfItems++
 
     return li
 }
@@ -70,12 +65,13 @@ function updateTaskNames() {
     listItems = document.getElementsByName('item')
     for (let i = 0; i < listItems.length; i++) {
         if (listItems[i].lastChild.innerHTML !== '' && !listItems[i].firstChild.checked) {
-            taskNames.push(listItems[i].lastChild.innerHTML)
+            taskNames.push(listItems[i].lastChild.innerHTML.replace('nbsp;', '')) 
             taskIndices.set(listItems[i].id, taskNames.length-1) // unique ID can find the index in the taskNames list now
         } else {
             taskIndices.set(listItems[i].id, -1)
         }
     }
+
     if (taskNames.length === 0)
         taskNames.push('No tasks')
     window.electronAPI.setMenu(taskNames)
@@ -93,24 +89,71 @@ function checkAddress(checkbox) {
     updateTaskNames()
 }
 
+function setCursor(nextElement, pos) {
+    var tag = nextElement;
+
+    if (nextElement.innerHTML === '') {
+        nextElement.focus()
+        return
+    }
+    var setpos = document.createRange();
+    var set = window.getSelection();
+    setpos.setStart(tag.childNodes[0], pos);
+    setpos.collapse(true);
+    set.removeAllRanges();
+    set.addRange(setpos);
+    tag.focus();
+}
+
 function keyDown(event, label) {
     if (event.keyCode === 13) { // add new task below current 
         updateTaskNames() 
         event.preventDefault()
         label.blur()
-
-        let newItem = createItem()
-        label.parentNode.parentNode.insertAdjacentElement('afterend', newItem)
-        newItem.firstChild.lastChild.focus()
+        console.log(event.code)
+        // if next node is empty, go to it
+        // else create new item
+        try {
+            if (label.parentNode.parentNode.nextSibling.firstChild.lastChild.innerHTML === '') {
+                label.parentNode.parentNode.nextSibling.firstChild.lastChild.focus()
+            } else {
+                let newItem = createItem()
+                label.parentNode.parentNode.insertAdjacentElement('afterend', newItem)
+                newItem.firstChild.lastChild.focus()
+            }
+        } catch {
+            let newItem = createItem()
+            label.parentNode.parentNode.insertAdjacentElement('afterend', newItem)
+            newItem.firstChild.lastChild.focus()
+        }
     }
     else if (event.keyCode === 8 && label.innerHTML === '') { 
+        if (label.previousSibling.checked)
+            pgb.setAttribute('value', --numItemsComplete)
+
         taskIndices.delete(label.parentNode.id) 
+        event.preventDefault()
+
+        try {
+            var nextElement = label.parentNode.parentNode.previousSibling.firstChild.lastChild
+            var endOfText = nextElement.innerHTML.length
+            setCursor(nextElement, endOfText)
+        } catch {
+            label.blur()
+        }
 
         label.parentNode.parentNode.remove()
-        numOfItems--
+
         updateTaskNames()
     }
-    pgb.setAttribute('max', numOfItems)
+    else if (event.keyCode === 8 && label.innerHTML.length === 1) { // down to empty element
+        numOfActualTasks--
+    }
+    else if (label.innerHTML === '' && event.keyCode ) { // down to empty element
+        numOfActualTasks++
+    }
+    console.log(numOfActualTasks)
+    pgb.setAttribute('max', numOfActualTasks)
 }
 
 addItemBtn.onclick = appendItem

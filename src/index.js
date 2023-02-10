@@ -62,7 +62,7 @@ let tray
 ipcMain.on('set-menu', (event, menu) => {
   let contextMenu = Menu()
   for (let i=0; i < menu.length; i++) {
-    contextMenu.append(new MenuItem({label: menu[i]}))
+    contextMenu.append(new MenuItem({label: menu[i], role: ''}))
     // console.log(menu[i])
   }
   tray.setContextMenu(contextMenu)
