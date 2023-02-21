@@ -65,19 +65,30 @@ function appendItem() {
 
 function updateTaskNames() {
     taskNames = []
+    completedTaskNames = []
+    incompleteTaskNames = []
     listItems = document.getElementsByName('item')
     for (let i = 0; i < listItems.length; i++) {
-        if (listItems[i].lastChild.innerHTML !== '' && !listItems[i].firstChild.checked) {
-            taskNames.push(listItems[i].lastChild.innerHTML.replace('nbsp;', '')) 
-            taskIndices.set(listItems[i].id, taskNames.length-1) // unique ID can find the index in the taskNames list now
+        if (listItems[i].lastChild.innerHTML !== '') {
+            if (!listItems[i].firstChild.checked) {
+                incompleteTaskNames.push(listItems[i].lastChild.innerHTML.replace('nbsp;', '')) 
+                taskNames.push(listItems[i].lastChild.innerHTML.replace('nbsp;', '')) 
+                taskIndices.set(listItems[i].id, taskNames.length-1) // unique ID can find the index in the taskNames list now
+            } else {
+                completedTaskNames.push(listItems[i].lastChild.innerHTML.replace('nbsp;', '')) 
+            }
         } else {
             taskIndices.set(listItems[i].id, -1)
         }
     }
 
-    if (taskNames.length === 0)
+    if (taskNames.length === 0) {
         taskNames.push('No tasks')
-    window.electronAPI.setMenu(taskNames)
+        incompleteTaskNames.push('None')
+        if (completedTaskNames.length === 0)
+            completedTaskNames.push('None')
+    }
+    window.electronAPI.setMenu(incompleteTaskNames, completedTaskNames)
 }
 
 function checkAddress(checkbox) {
@@ -134,15 +145,6 @@ function getCaretPosition(label) {
 }
 
 function keyDown(event, label) {
-    // var set = window.getSelection();
-    // console.log(label.selectionStart)
-    // let _range = document.getSelection().getRangeAt(0)
-    // let range = _range.cloneRange()
-    // range.selectNodeContents(label.target)
-    // range.setEnd(_rang.endContainer, _range.endOffset)
-    // console.log(range.toString().length)
-    // console.log(range.startOffset)
-
     if (event.keyCode === 13) { // add new task below current 
         updateTaskNames() 
         event.preventDefault()

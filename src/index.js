@@ -59,18 +59,36 @@ const {ipcMain} = require('electron')
 
 let tray
 
-ipcMain.on('set-menu', (event, menu) => {
+ipcMain.on('set-menu', (evet, incompleteTasks, completeTasks) => {
   let contextMenu = Menu()
-  for (let i=0; i < menu.length; i++) {
-    contextMenu.append(new MenuItem({label: menu[i], role: ''}))
-    // console.log(menu[i])
+  if (incompleteTasks[0]==='None' && completeTasks[0]==='None') {
+    contextMenu.append(new MenuItem({label: 'No tasks', role: 'unhide'}))
+    tray.setContextMenu(contextMenu)
+    return
   }
+  // const dotIcon = nativeImage.createFromPath('src/media/circle.fill@2x.png')
+  contextMenu.append(new MenuItem({label: 'To-do:', role: 'unhide'}))
+  if (incompleteTasks[0]!=='None') {
+    for (let i=0; i < incompleteTasks.length; i++) {
+      contextMenu.append(new MenuItem({label: incompleteTasks[i]}))
+    }
+  }
+
+  contextMenu.append(new MenuItem({type: 'separator'}))
+
+  contextMenu.append(new MenuItem({label: 'Completed:', role: 'unhide'}))
+  if (completeTasks[0]!=='None') {
+    for (let i=0; i < completeTasks.length; i++) {
+      contextMenu.append(new MenuItem({label: completeTasks[i]}))
+    }
+  }
+
   tray.setContextMenu(contextMenu)
 })
 
 app.whenReady().then(() => {
   const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
   tray = new Tray(icon)    
-  let contextMenu = Menu.buildFromTemplate([{label: 'No tasks yet'}])
+  let contextMenu = Menu.buildFromTemplate([{label: 'No tasks', role: 'unhide'}])
   tray.setContextMenu(contextMenu)   
 })

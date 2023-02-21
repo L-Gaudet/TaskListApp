@@ -4,5 +4,5 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    setMenu: (menu) => ipcRenderer.send('set-menu', menu)
+    setMenu: (incompleteTasks, completeTasks) => ipcRenderer.send('set-menu', incompleteTasks, completeTasks)
 })
