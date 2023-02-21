@@ -40,6 +40,8 @@ function createItem() {
     label.setAttribute('data-content-editable-leaf', 'true')
     label.setAttribute('onkeydown', 'keyDown(event, this)')
     label.setAttribute('onkeyup', 'keyUp(event, this)')
+    label.setAttribute('data-isCounted', 'false')
+
     label.setAttribute('onfocusout', 'updateTaskNames()')
     label.setAttribute('onfocus', 'selectCurrentElement(this);')
 
@@ -106,6 +108,31 @@ function setCursor(nextElement, pos) {
     tag.focus();
 }
 
+function getCaretPosition(label) {
+    var caretPos = 0,
+        sel, range;
+    if (window.getSelection) {
+        sel = window.getSelection();
+        if (sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            if (range.commonAncestorContainer.parentNode == label) {
+                caretPos = range.endOffset;
+            }
+        }
+    } else if (document.selection && document.selection.createRange) {
+        range = document.selection.createRange();
+        if (range.parentElement() == label) {
+            var tempEl = document.createElement("span");
+            label.insertBefore(tempEl, label.firstChild);
+            var tempRange = range.duplicate();
+            tempRange.moveToElementText(tempEl);
+            tempRange.setEndPoint("EndToEnd", range);
+            caretPos = tempRange.text.length;
+        }
+    }
+    return caretPos;
+}
+
 function keyDown(event, label) {
     // var set = window.getSelection();
     // console.log(label.selectionStart)
@@ -114,8 +141,7 @@ function keyDown(event, label) {
     // range.selectNodeContents(label.target)
     // range.setEnd(_rang.endContainer, _range.endOffset)
     // console.log(range.toString().length)
-    range = window.getSelection()
-    console.log(range.startOffset)
+    // console.log(range.startOffset)
 
     if (event.keyCode === 13) { // add new task below current 
         updateTaskNames() 
@@ -138,18 +164,21 @@ function keyDown(event, label) {
             newItem.firstChild.lastChild.focus()
         }
     }
-    else if (event.keyCode === 8 && label.innerHTML === '') { 
-        if (label.previousSibling.checked)
-            // label.innerHTML.caretPosition()
+    else if (event.keyCode === 8 && getCaretPosition(label)  === 0) {  // if delete is pressed and caret is on left side,
+        if (label.previousSibling.checked)                     // move text to previous node
             pgb.setAttribute('value', --numItemsComplete)
+        if (label.innerHTML.length !== 0)
+            pgb.setAttribute('max', --numOfActualTasks)
 
         taskIndices.delete(label.parentNode.id) 
         event.preventDefault()
 
         try {
+            var textToMove = label.innerHTML
             var nextElement = label.parentNode.parentNode.previousSibling.firstChild.lastChild
-            var endOfText = nextElement.innerHTML.length
-            setCursor(nextElement, endOfText)
+            nextElement.innerHTML += textToMove
+            var newCaretPos = nextElement.innerHTML.length - textToMove.length
+            setCursor(nextElement, newCaretPos)
         } catch {
             try { // if top element is deleted, will focus next item. if none left, blurs label
                 label.parentNode.parentNode.nextSibling.firstChild.lastChild.focus() 
@@ -162,24 +191,24 @@ function keyDown(event, label) {
 
         updateTaskNames()
     }
-    // for this branch going to try and change it so that it decrements numOfActualTasks when
-    // the cursor is on the left most spot (regardless of whats to the right of it) and move 
-    // whatever is to the right of it to the previous task.
-    else if (event.keyCode === 8 && label.innerHTML.length === 1) { // down to empty element
+    else if (event.keyCode === 8 && label.innerHTML.length === 1) { // down to empty element, empty elem not counted in bar
         numOfActualTasks--
     }
-    // 
-    else if (label.innerHTML === '' && event.keyCode ) { // down to empty element
-        // console.log(event.compositionupdate)
-        // if (event.isComposing)
-            numOfActualTasks++
+    else if (event.keyCode === 46 && label.innerHTML.length === 1 && getCaretPosition(label) === 0) { // down to empty, 46 is del to the right
+        numOfActualTasks--
     }
-    // console.log(numOfActualTasks)
-    pgb.setAttribute('max', numOfActualTasks)
 }
 
 function keyUp(event, label) {
-    // console.log(event.isComposing)
+    // console.log(label.dataset.iscounted)
+    if (label.innerHTML.length >= 1 && label.dataset.iscounted === 'false') {
+        // console.log('incrememtn numActualTakss')
+        ++numOfActualTasks
+        label.dataset.iscounted = 'true'
+    } else if (label.innerHTML.length === 0)
+        label.dataset.iscounted = 'false'
+    pgb.setAttribute('max', numOfActualTasks)
+    console.log(numOfActualTasks)
 }
 
 addItemBtn.onclick = appendItem
