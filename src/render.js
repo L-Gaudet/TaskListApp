@@ -63,6 +63,11 @@ function appendItem() {
     return newItem.firstChild.lastChild
 }
 
+function updateProgressBar() {
+    pgb.setAttribute('value', numItemsComplete)
+    pgb.setAttribute('max', numOfActualTasks)
+}
+
 function updateTaskNames() {
     taskNames = []
     completedTaskNames = []
@@ -81,7 +86,7 @@ function updateTaskNames() {
             taskIndices.set(listItems[i].id, -1)
         }
     }
-
+    // pgb.setAttribute('value', completedTaskNames.length)
     if (taskNames.length === 0) {
         taskNames.push('No tasks')
         incompleteTaskNames.push('None')
@@ -93,13 +98,40 @@ function updateTaskNames() {
 
 function checkAddress(checkbox) {
     if (checkbox.checked) {
-        pgb.setAttribute('value', ++numItemsComplete);
-        checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%; text-decoration: line-through;')
+        if (checkbox.nextSibling.innerHTML.length != 0) {
+            ++numItemsComplete
+            checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%; text-decoration: line-through;')
+        }
     }
     else {
-        pgb.setAttribute('value', --numItemsComplete);
-        checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%;')
+        if (checkbox.nextSibling.innerHTML.length != 0) {
+            --numItemsComplete
+            checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%;')
+        }
     }
+    updateProgressBar()
+    updateTaskNames()
+}
+
+function checkIfChecked(checkbox) {
+    if (checkbox.checked) {
+        if (checkbox.nextSibling.innerHTML.length !== 0) {
+            console.log('incrementing numItemsComplete')
+            ++numItemsComplete
+            checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%; text-decoration: line-through;')
+        }
+    }
+    else {
+        if (checkbox.nextSibling.innerHTML.length === 0) {
+            console.log('decrimenting numItemsComplete')
+            --numItemsComplete
+            checkbox.nextSibling.setAttribute('style', 'outline: 0; min-width: 25%; max-width: 100%;')
+        }
+    }
+    updateProgressBar()
+    console.log('size of completed bar: ' + String(pgb.value))
+    console.log('size of total bar: ' + String(pgb.max))
+
     updateTaskNames()
 }
 
@@ -145,6 +177,7 @@ function getCaretPosition(label) {
 }
 
 function keyDown(event, label) {
+    console.log(getCaretPosition(label))
     if (event.keyCode === 13) { // add new task below current 
         updateTaskNames() 
         event.preventDefault()
@@ -168,9 +201,11 @@ function keyDown(event, label) {
     }
     else if (event.keyCode === 8 && getCaretPosition(label)  === 0) {  // if delete is pressed and caret is on left side,
         if (label.previousSibling.checked)                     // move text to previous node
-            pgb.setAttribute('value', --numItemsComplete)
+            --numItemsComplete
+            // pgb.setAttribute('value', --numItemsComplete)
         if (label.innerHTML.length !== 0)
-            pgb.setAttribute('max', --numOfActualTasks)
+            --numOfActualTasks
+            // pgb.setAttribute('max', --numOfActualTasks)
 
         taskIndices.delete(label.parentNode.id) 
         event.preventDefault()
@@ -191,7 +226,8 @@ function keyDown(event, label) {
 
         label.parentNode.parentNode.remove()
 
-        updateTaskNames()
+        // updateProgressBar()
+        
     }
     else if (event.keyCode === 8 && label.innerHTML.length === 1) { // down to empty element, empty elem not counted in bar
         numOfActualTasks--
@@ -199,6 +235,8 @@ function keyDown(event, label) {
     else if (event.keyCode === 46 && label.innerHTML.length === 1 && getCaretPosition(label) === 0) { // down to empty, 46 is del to the right
         numOfActualTasks--
     }
+    updateTaskNames()
+    updateProgressBar()
 }
 
 function keyUp(event, label) {
@@ -207,10 +245,13 @@ function keyUp(event, label) {
         // console.log('incrememtn numActualTakss')
         ++numOfActualTasks
         label.dataset.iscounted = 'true'
+        checkIfChecked(label.previousSibling) // checks checkbox once text is typed in box
     } else if (label.innerHTML.length === 0)
         label.dataset.iscounted = 'false'
-    pgb.setAttribute('max', numOfActualTasks)
-    console.log(numOfActualTasks)
+    if (event.keyCode == 8 && g)
+    // pgb.setAttribute('max', numOfActualTasks)
+    updateProgressBar()
+    console.log('num of actual tasks: ' + String(numOfActualTasks))
 }
 
 addItemBtn.onclick = appendItem
