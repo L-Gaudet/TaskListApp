@@ -2,6 +2,7 @@ const { app, BrowserWindow} = require('electron');
 const path = require('path');
 const HTMLParser = require('node-html-parser');
 
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -10,10 +11,10 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 800,
+    width: 580,
+    height: 700,
     titleBarStyle: 'hidden',
-    icon: "src/media/listclipboard@2x.png",
+    icon: "./src/media/icon.icns",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -23,7 +24,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -59,6 +60,15 @@ const {ipcMain} = require('electron')
 
 let tray
 
+app.whenReady().then(() => { 
+  // const icon = nativeImage.createFromPath('/my-app/src/media/list.clipboard.fill@2x.png')
+  const icon = nativeImage.createFromPath(path.join(__dirname,'media','listclipboardfill@2x.png'))
+  tray = new Tray(icon)    
+  // tray = new Tray(require('path').resolve(__statics, 'list.clipboard.fill@2x.png'))  
+  let contextMenu = Menu.buildFromTemplate([{label: 'No tasks', role: 'unhide'}])
+  tray.setContextMenu(contextMenu)   
+})
+
 ipcMain.on('set-menu', (evet, incompleteTasks, completeTasks) => {
   let contextMenu = Menu()
   if (incompleteTasks[0]==='None' && completeTasks[0]==='None') {
@@ -79,16 +89,31 @@ ipcMain.on('set-menu', (evet, incompleteTasks, completeTasks) => {
   contextMenu.append(new MenuItem({label: 'Completed:', role: 'unhide'}))
   if (completeTasks[0]!=='None') {
     for (let i=0; i < completeTasks.length; i++) {
-      contextMenu.append(new MenuItem({label: completeTasks[i]}))
+      contextMenu.append(new MenuItem({label: completeTasks[i], role: 'window'}))
     }
   }
 
   tray.setContextMenu(contextMenu)
 })
 
-app.whenReady().then(() => {
-  const icon = nativeImage.createFromPath('src/media/list.clipboard.fill@2x.png')
-  tray = new Tray(icon)    
-  let contextMenu = Menu.buildFromTemplate([{label: 'No tasks', role: 'unhide'}])
-  tray.setContextMenu(contextMenu)   
-})
+// BrowserWindow.getFocusedWindow().on('close', () => {
+//   BrowserWindow.getFocusedWindow().webContents.savePage(path.join(__dirname, 'index.html'), 'HTMLComplete').then(() => {
+//     console.log('Page was saved successfully.')
+//   }).catch(err => {
+//       console.log(err);
+//   });
+// })
+
+// app.on('before-quit', (e) => {
+//   // e.preventDefault()
+//   // win.webContents.savePage(filepathlocal, 'HTMLComplete')
+//   // window.webContents.savePage('')
+//   BrowserWindow.getFocusedWindow().emit('false')
+//   BrowserWindow.getFocusedWindow().webContents.savePage(path.join(__dirname, 'bruh.html'), 'HTMLComplete').then(() => {
+//       console.log('Page was saved successfully.')
+//   }).catch(err => {
+//       console.log(err);
+//   });
+//   // app.quit()
+//   // /Users/lucas/Documents/codingProjects/TaskListApp/TaskList/src/index.html
+// })

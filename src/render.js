@@ -235,11 +235,12 @@ function keyDown(event, label) {
     else if (event.keyCode === 46 && label.innerHTML.length === 1 && getCaretPosition(label) === 0) { // down to empty, 46 is del to the right
         numOfActualTasks--
     }
-    updateTaskNames()
+    
     updateProgressBar()
 }
 
 function keyUp(event, label) {
+    updateTaskNames()
     // console.log(label.dataset.iscounted)
     if (label.innerHTML.length >= 1 && label.dataset.iscounted === 'false') {
         // console.log('incrememtn numActualTakss')
